@@ -12,6 +12,7 @@ String dbPath = "jdbc:h2:~/FoodDB";
    *
    ********************************************************************************************************************/
   Database() throws SQLException, ClassNotFoundException, IllegalAccessException, InstantiationException {
+
       createDB();
       createTable();
 
@@ -23,8 +24,10 @@ String dbPath = "jdbc:h2:~/FoodDB";
    * Creates the database
    ********************************************************************************************************************/
     public void createDB() throws SQLException, ClassNotFoundException {
+        //Must declare database driver or the whole damn thing freaks out at you
         Class.forName("org.h2.Driver");
-        Connection conn = DriverManager.getConnection(dbPath,"user","password");
+
+
     }//Close createDB
 
    /********************************************************************************************************************
@@ -34,13 +37,20 @@ String dbPath = "jdbc:h2:~/FoodDB";
    ********************************************************************************************************************/
     public void createTable(){
         try{
+            //Establish connection to the database
             Connection conn = DriverManager.getConnection(dbPath,"user","password");
+
+            //Statement builders are apparently a necessity
             Statement stmt = conn.createStatement();
+
+            //Command passed to SQL database as a String
             String sql = "CREATE TABLE IF NOT EXISTS FOOD "
                     +"(name varchar(20), "
                     +"type varchar(20))";
 
+            //Execute passed statement
             stmt.executeUpdate(sql);
+
         }catch (Exception e){
             System.err.println(e.getMessage());
         }
@@ -55,10 +65,19 @@ String dbPath = "jdbc:h2:~/FoodDB";
     public void addName(String name,String type)  {
 
         try {
+
+            //Establish connection to the database
             Connection conn = DriverManager.getConnection(dbPath ,"user","password");
+
+            //Statement builders are apparently a necessity
             Statement statement = conn.createStatement();
+
+            //Command passed to SQL database as a String
             String sql = "Insert into FOOD(name, type) values" + "('" + name + "', '" + type + "')";
+
+            //Execute passed statement
             statement.executeUpdate(sql);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -80,12 +99,22 @@ String dbPath = "jdbc:h2:~/FoodDB";
    * Prints entire database
    ********************************************************************************************************************/
    public void printDB(){
-
+  //TODO fix this method so its useful in production
        try {
-       Connection conn = DriverManager.getConnection(dbPath ,"user","password");
-       Statement statement = conn.createStatement();
-       String sql = "select * from FOOD";
-       ResultSet resultSet = statement.executeQuery(sql);
+
+            //Establish connection to the database
+            Connection conn = DriverManager.getConnection(dbPath ,"user","password");
+
+            //Statement builders are apparently a necessity
+            Statement statement = conn.createStatement();
+
+           //Command passed to SQL database as a String
+            String sql = "select * from FOOD";
+
+           //Execute passed statement
+            ResultSet resultSet = statement.executeQuery(sql);
+
+       //Keep printing while there's stuff to print
        while(resultSet.next()){
            System.out.println(resultSet.getString(1) + " " + resultSet.getString(2));
        }
@@ -97,12 +126,38 @@ String dbPath = "jdbc:h2:~/FoodDB";
 
 
    }//Close printDB
+   /********************************************************************************************************************
+   * clearDB
+   *
+   * Deletes the entire database
+   ********************************************************************************************************************/
+    public void clearDB(){
+        try {
+
+            //Establish connection to the database
+            Connection conn = DriverManager.getConnection(dbPath ,"user","password");
+
+            //Statement builders are apparently a necessity
+            Statement statement = conn.createStatement();
+
+            //Command passed to SQL database as a String
+            String sql = "DELETE from FOOD";
+
+            //Execute passed statement
+            statement.execute(sql);
+
+            } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+    }
 
     public static void main(String[] args) throws SQLException, IllegalAccessException, InstantiationException, ClassNotFoundException {
     Database mydb = new Database();
-    mydb.printDB();
-    mydb.addName("burrito", "mexican");
-    mydb.printDB();
+    //mydb.clearDB();
+    //mydb.printDB();
+    //mydb.addName("burrito", "mexican");
+    //mydb.printDB();
     }//Close main
 
 
