@@ -1,7 +1,7 @@
 package WhatsForDinner;
 import java.sql.*;
 
-
+//TODO String builder method probably a good idea
 
 class Database{
 String dbPath = "jdbc:h2:~/FoodDB";
