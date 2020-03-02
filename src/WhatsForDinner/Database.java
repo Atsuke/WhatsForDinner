@@ -2,6 +2,8 @@ package WhatsForDinner;
 import java.sql.*;
 
 //TODO String builder method probably a good idea
+//TODO Add method to randomly pull recipe from db
+//TODO search parameter for protein type
 
 class Database{
 String dbPath = "jdbc:h2:~/FoodDB";
@@ -11,7 +13,7 @@ String dbPath = "jdbc:h2:~/FoodDB";
    *
    *
    ********************************************************************************************************************/
-  Database() throws SQLException, ClassNotFoundException, IllegalAccessException, InstantiationException {
+  Database() throws SQLException, ClassNotFoundException {
 
       createDB();
       createTable();
@@ -23,7 +25,7 @@ String dbPath = "jdbc:h2:~/FoodDB";
    *
    * Creates the database
    ********************************************************************************************************************/
-    public void createDB() throws SQLException, ClassNotFoundException {
+    public void createDB() throws ClassNotFoundException {
         //Must declare database driver or the whole damn thing freaks out at you
         Class.forName("org.h2.Driver");
 
@@ -90,7 +92,7 @@ String dbPath = "jdbc:h2:~/FoodDB";
    *  inserts food name into database.
    ********************************************************************************************************************/
     public void addIngredient(String ingredient){
-
+        //TODO write me!
     }//Close addIngredient.
 
    /********************************************************************************************************************
@@ -152,12 +154,12 @@ String dbPath = "jdbc:h2:~/FoodDB";
 
     }
 
-    public static void main(String[] args) throws SQLException, IllegalAccessException, InstantiationException, ClassNotFoundException {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
     Database mydb = new Database();
     //mydb.clearDB();
     //mydb.printDB();
-    //mydb.addName("burrito", "mexican");
-    //mydb.printDB();
+    mydb.addName("burrito", "mexican");
+    mydb.printDB();
     }//Close main
 
 
