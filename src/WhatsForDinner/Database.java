@@ -2,24 +2,30 @@ package WhatsForDinner;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 //TODO Add method to randomly pull recipe from db
 //TODO search parameter for protein type
 
 class Database{
+
 String dbPath = "jdbc:h2:~/FoodDB";
 private List<String> arguments = new ArrayList<>();
 private StringBuilder sb = new StringBuilder();
-private Connection conn = DriverManager.getConnection(dbPath ,"user","password");
+private int counter = 3;
+
+
    /********************************************************************************************************************
    *  Default Constructor
    *
    *
    ********************************************************************************************************************/
-  Database() throws SQLException, ClassNotFoundException {
+  Database() throws SQLException {
 
       createDB();
       createTable();
+      resetArguments();
+
 
   }//Close default constructor.
 
@@ -48,7 +54,7 @@ private Connection conn = DriverManager.getConnection(dbPath ,"user","password")
         try{
             //Establish connection to the database
             //Connection conn = DriverManager.getConnection(dbPath,"user","password");
-
+            Connection conn = DriverManager.getConnection(dbPath ,"user","password");
             //Statement builders are apparently a necessity
             Statement stmt = conn.createStatement();
 
@@ -93,7 +99,7 @@ private Connection conn = DriverManager.getConnection(dbPath ,"user","password")
 
    public void resetArguments(){
        for(int i=0;i< 18; ++i){
-           arguments.set(i, " ");
+           arguments.add(i, " ");
        }
    }//close resetArguments
 
@@ -150,7 +156,8 @@ private Connection conn = DriverManager.getConnection(dbPath ,"user","password")
    * adds ingredient to the sql string to be inserted into the database.
    ********************************************************************************************************************/
     public void addIngredient(String ingredient){
-        arguments.add(ingredient);
+        arguments.add(counter, ingredient);
+        counter++;
     }//Close addIngredient.
 
 
@@ -165,6 +172,7 @@ private Connection conn = DriverManager.getConnection(dbPath ,"user","password")
        //Command passed to SQL database as a String
        Statement statement = null;
        try {
+           Connection conn = DriverManager.getConnection(dbPath ,"user","password");
            statement = conn.createStatement();
 
            String sqlInsert = "Insert into FOOD values" +
@@ -177,6 +185,9 @@ private Connection conn = DriverManager.getConnection(dbPath ,"user","password")
            //Execute passed statement
            statement.executeUpdate(sqlInsert);
 
+           counter = 3;
+           resetArguments();
+
        } catch (SQLException e) {
            e.printStackTrace();
        }
@@ -188,24 +199,134 @@ private Connection conn = DriverManager.getConnection(dbPath ,"user","password")
    /********************************************************************************************************************
    * searchByName
    * @param name
+   * @return ArrayList resultList
    * Searches Database by name of food
    ********************************************************************************************************************/
-//todo
+   public ArrayList<ArrayList<String>> searchByName(String name){
+
+       ArrayList<ArrayList<String>> resultList = new ArrayList<>();
+
+       try {
+
+           //Open Database connections
+           Connection conn = DriverManager.getConnection(dbPath ,"user","password");
+
+           //create the statement to be passed to the SQL database
+           Statement statement = conn.createStatement();
+
+           //our search query
+           String sql = "select * from FOOD where name = '"+ name +"' ";
+
+           //Execute passed statement
+           ResultSet resultSet = statement.executeQuery(sql);
+
+           //add each part of the recipe to an array list of strings
+           while(resultSet.next()){
+               ArrayList recipe = new ArrayList<>();
+               for(int i =1; i<=19;i++){
+                   recipe.add(resultSet.getString(i));
+               }
+               //add each recipe to the list of results that matched the query
+                resultList.add(recipe);
+
+           }//close while
+
+       } catch (SQLException e) {
+           e.printStackTrace();
+       }
+
+       //an array list of array lists.
+       return resultList;
+   }//close searchByName
 
    /********************************************************************************************************************
    * searchByType
    * @param type
+   * @return ArrayList resultList
    * Searches DB for type of food
    ********************************************************************************************************************/
-//todo
-   /********************************************************************************************************************
-   * searchbyProtein
-   * @param protein
-   * Seraches DB for type of protein
-   ********************************************************************************************************************/
-//todo
+   public ArrayList<ArrayList<String>> searchByType(String type){
 
-   /********************************************************************************************************************
+       ArrayList<ArrayList<String>> resultList = new ArrayList<>();
+
+       try {
+
+           //Open Database connections
+           Connection conn = DriverManager.getConnection(dbPath ,"user","password");
+
+           //create the statement to be passed to the SQL database
+           Statement statement = conn.createStatement();
+
+           //our search query
+           String sql = "select * from FOOD where type = '"+ type +"' ";
+
+           //Execute passed statement
+           ResultSet resultSet = statement.executeQuery(sql);
+
+           //add each part of the recipe to an array list of strings
+           while(resultSet.next()){
+               ArrayList recipe = new ArrayList<>();
+               for(int i =1; i<=19;i++){
+                   recipe.add(resultSet.getString(i));
+               }
+               //add each recipe to the list of results that matched the query
+               resultList.add(recipe);
+
+           }//close while
+
+       } catch (SQLException e) {
+           e.printStackTrace();
+       }
+
+       //an array list of array lists.
+       return resultList;
+   }//close searchByType
+
+    /********************************************************************************************************************
+    * searchbyProtein
+    * @param protein
+    * @return ArrayList resultList
+    * Seraches DB for type of protein
+    ********************************************************************************************************************/
+    public ArrayList<ArrayList<String>> searchByProtein(String protein){
+
+        ArrayList<ArrayList<String>> resultList = new ArrayList<>();
+
+        try {
+
+            //Open Database connections
+            Connection conn = DriverManager.getConnection(dbPath ,"user","password");
+
+            //create the statement to be passed to the SQL database
+            Statement statement = conn.createStatement();
+
+            //our search query
+            String sql = "select * from FOOD where protein = '"+ protein +"' ";
+
+            //Execute passed statement
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            //add each part of the recipe to an array list of strings
+            while(resultSet.next()){
+                ArrayList recipe = new ArrayList<>();
+                for(int i =1; i<=19;i++){
+                    recipe.add(resultSet.getString(i));
+                }
+                //add each recipe to the list of results that matched the query
+                resultList.add(recipe);
+
+            }//close while
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        //an array list of array lists.
+        return resultList;
+    }//close searchByProtein
+
+
+    /********************************************************************************************************************
    * printDB
    *
    * Prints entire database
@@ -213,15 +334,16 @@ private Connection conn = DriverManager.getConnection(dbPath ,"user","password")
    public void printDB(){
   //TODO fix this method so its useful in production
        try {
-
+           Connection conn = DriverManager.getConnection(dbPath ,"user","password");
             //Statement builders are apparently a necessity
             Statement statement = conn.createStatement();
 
            //Command passed to SQL database as a String
             String sql = "select * from FOOD";
-              //String sql = "select * from FOOD where type = 'mexican'";
+
            //Execute passed statement
             ResultSet resultSet = statement.executeQuery(sql);
+
 
        //Keep printing while there's stuff to print
        while(resultSet.next()){
@@ -240,7 +362,6 @@ private Connection conn = DriverManager.getConnection(dbPath ,"user","password")
            );
        }
 
-
        } catch (SQLException e) {
            e.printStackTrace();
        }
@@ -256,6 +377,8 @@ private Connection conn = DriverManager.getConnection(dbPath ,"user","password")
    ********************************************************************************************************************/
     public void clearDB(){
         try {
+
+            Connection conn = DriverManager.getConnection(dbPath ,"user","password");
             //Statement builders are apparently a necessity
             Statement statement = conn.createStatement();
 
@@ -275,9 +398,9 @@ private Connection conn = DriverManager.getConnection(dbPath ,"user","password")
     Database mydb = new Database();
     //mydb.clearDB();
     //mydb.printDB();
-    /*mydb.addName("spaghetti");
-    mydb.addType("italian");
-    mydb.addProtein("beef");
+    mydb.addName("burrito");
+    mydb.addType("murican");
+    mydb.addProtein("chicken");
     mydb.addIngredient("1");
     mydb.addIngredient("2");
     mydb.addIngredient("3");
@@ -288,14 +411,15 @@ private Connection conn = DriverManager.getConnection(dbPath ,"user","password")
     mydb.addIngredient("3");
     mydb.addIngredient("4");
     mydb.addIngredient("5");
-    mydb.addIngredient("1");
-    mydb.addIngredient("2");
-    mydb.addIngredient("3");
-    mydb.addIngredient("4");
-    mydb.addIngredient("5");
+    //mydb.addIngredient("1");
+    //mydb.addIngredient("2");
+    //mydb.addIngredient("3");
+    //mydb.addIngredient("4");
+    //mydb.addIngredient("5");
     mydb.addInstructions("Instruct a motherfucker on how to do a thing");
-    mydb.insertRecipe();*/
+    mydb.insertRecipe();
     mydb.printDB();
+    //System.out.println(mydb.searchByProtein("pork"));
     }//Close main
 
 
