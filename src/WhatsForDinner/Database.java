@@ -1,13 +1,17 @@
 package WhatsForDinner;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
-//TODO String builder method probably a good idea
 //TODO Add method to randomly pull recipe from db
 //TODO search parameter for protein type
 
 class Database{
 String dbPath = "jdbc:h2:~/FoodDB";
-
+private String sql;
+private List<String> arguments = new ArrayList<>();
+private StringBuilder sb = new StringBuilder();
+private Connection conn = DriverManager.getConnection(dbPath ,"user","password");
    /********************************************************************************************************************
    *  Default Constructor
    *
@@ -40,18 +44,38 @@ String dbPath = "jdbc:h2:~/FoodDB";
     public void createTable(){
         try{
             //Establish connection to the database
-            Connection conn = DriverManager.getConnection(dbPath,"user","password");
+            //Connection conn = DriverManager.getConnection(dbPath,"user","password");
 
             //Statement builders are apparently a necessity
             Statement stmt = conn.createStatement();
 
             //Command passed to SQL database as a String
-            String sql = "CREATE TABLE IF NOT EXISTS FOOD "
-                    +"(name varchar(20), "
-                    +"type varchar(20))";
+            sql = "CREATE TABLE IF NOT EXISTS FOOD "
+                    +"(Name varchar(20), "
+                    +"Type varchar(20), "
+                    +"Protein varchar(20),"
+                    +"Ingredient1 varchar(20),"
+                    +"Ingredient2 varchar(20),"
+                    +"Ingredient3 varchar(20),"
+                    +"Ingredient4 varchar(20),"
+                    +"Ingredient5 varchar(20),"
+                    +"Ingredient6 varchar(20),"
+                    +"Ingredient7 varchar(20),"
+                    +"Ingredient8 varchar(20),"
+                    +"Ingredient9 varchar(20),"
+                    +"Ingredient10 varchar(20),"
+                    +"Ingredient11 varchar(20),"
+                    +"Ingredient12 varchar(20),"
+                    +"Ingredient13 varchar(20),"
+                    +"Ingredient14 varchar(20),"
+                    +"Ingredient15 varchar(20),"
+                    +"Instructions varchar(500))"
+
+            ;
 
             //Execute passed statement
             stmt.executeUpdate(sql);
+            clearSQLString();
 
         }catch (Exception e){
             System.err.println(e.getMessage());
@@ -64,36 +88,59 @@ String dbPath = "jdbc:h2:~/FoodDB";
    * @param name
    * inserts food name into database.
    ********************************************************************************************************************/
-    public void addName(String name,String type)  {
+    public void addName(String name)  {
 
-        try {
-
-            //Establish connection to the database
-            Connection conn = DriverManager.getConnection(dbPath ,"user","password");
-
-            //Statement builders are apparently a necessity
-            Statement statement = conn.createStatement();
-
-            //Command passed to SQL database as a String
-            String sql = "Insert into FOOD(name, type) values" + "('" + name + "', '" + type + "')";
-
-            //Execute passed statement
-            statement.executeUpdate(sql);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
+        arguments.add(0,name);
 
     }//Close addName
+
+
    /********************************************************************************************************************
-   * addIngerdient
+   * addType
+   * @param type
+   * inserts food type into string for database.
+   ********************************************************************************************************************/
+   public void addType(String type)  {
+
+    arguments.add(1,type);
+
+   }//Close addType
+
+
+   /********************************************************************************************************************
+   * addIngredient
    * @param ingredient
-   *  inserts food name into database.
+   * adds ingredient to the sql string to be inserted into the database.
    ********************************************************************************************************************/
     public void addIngredient(String ingredient){
-        //TODO write me!
+        arguments.add(ingredient);
     }//Close addIngredient.
+
+   /********************************************************************************************************************
+   * Insert Recipe
+   *
+   * Inserts the Recipe into the Database.
+   ********************************************************************************************************************/
+
+   public void insertRecipe() throws SQLException {
+       //Command passed to SQL database as a String
+       Connection conn = DriverManager.getConnection(dbPath ,"user","password");
+       Statement statement = conn.createStatement();
+
+
+       String sqlInsert = "Insert into FOOD values" +
+               "('" + arguments.get(0) + "', '" + arguments.get(1) + "', '" + arguments.get(2) + "', '" + arguments.get(3) + "'," +
+               " '" + arguments.get(4) + "', '" + arguments.get(5) + "', '" + arguments.get(6) + "', '" + arguments.get(7) + "'," +
+               " '" + arguments.get(8) + "', '" + arguments.get(9) + "', '" + arguments.get(10) + "','" + arguments.get(11) + "'," +
+               " '" + arguments.get(12) + "', '" + arguments.get(13) + "', '" + arguments.get(14) + "', '" + arguments.get(15) + "'," +
+               " '" + arguments.get(16) + "', '" + arguments.get(17) + "', '" + arguments.get(18) + "')";
+
+       //Execute passed statement
+       statement.executeUpdate(sqlInsert);
+       clearSQLString();
+
+   }//close insertCommand
+
 
    /********************************************************************************************************************
    * printDB
@@ -111,14 +158,27 @@ String dbPath = "jdbc:h2:~/FoodDB";
             Statement statement = conn.createStatement();
 
            //Command passed to SQL database as a String
-            String sql = "select * from FOOD";
+            sql = "select * from FOOD";
 
            //Execute passed statement
             ResultSet resultSet = statement.executeQuery(sql);
+            clearSQLString();
 
        //Keep printing while there's stuff to print
        while(resultSet.next()){
-           System.out.println(resultSet.getString(1) + " " + resultSet.getString(2));
+           System.out.println(
+                         resultSet.getString(1) + " " + resultSet.getString(2) +
+                   " " + resultSet.getString(3) + " " + resultSet.getString(4)+
+                   " " + resultSet.getString(5) + " " + resultSet.getString(6)+
+                   " " + resultSet.getString(7) + " " + resultSet.getString(8)+
+                   " " + resultSet.getString(9) + " " + resultSet.getString(10)+
+                   " " + resultSet.getString(11) + " " + resultSet.getString(12)+
+                   " " + resultSet.getString(13) + " " + resultSet.getString(14)+
+                   " " + resultSet.getString(15) + " " + resultSet.getString(16)+
+                   " " + resultSet.getString(17) + " " + resultSet.getString(18)+
+                   " " + resultSet.getString(19)
+
+           );
        }
 
 
@@ -128,6 +188,18 @@ String dbPath = "jdbc:h2:~/FoodDB";
 
 
    }//Close printDB
+
+   /********************************************************************************************************************
+   * clearSQLString
+   *
+   * resets the SQL string
+   ********************************************************************************************************************/
+
+   public void clearSQLString(){
+       sql = "Insert into FOOD values ";
+   }//close clearSQLSting
+
+
    /********************************************************************************************************************
    * clearDB
    *
@@ -143,10 +215,11 @@ String dbPath = "jdbc:h2:~/FoodDB";
             Statement statement = conn.createStatement();
 
             //Command passed to SQL database as a String
-            String sql = "DELETE from FOOD";
+            sql = "DELETE from FOOD";
 
             //Execute passed statement
             statement.execute(sql);
+            clearSQLString();
 
             } catch (SQLException ex) {
             ex.printStackTrace();
@@ -156,9 +229,28 @@ String dbPath = "jdbc:h2:~/FoodDB";
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
     Database mydb = new Database();
-    //mydb.clearDB();
+    mydb.clearDB();
     //mydb.printDB();
-    mydb.addName("burrito", "mexican");
+    mydb.addName("burrito");
+    mydb.addType("MEXICAN");
+    mydb.addType("BEEF");
+    mydb.addIngredient("1");
+    mydb.addIngredient("2");
+    mydb.addIngredient("3");
+    mydb.addIngredient("4");
+    mydb.addIngredient("5");
+    mydb.addIngredient("1");
+    mydb.addIngredient("2");
+    mydb.addIngredient("3");
+    mydb.addIngredient("4");
+    mydb.addIngredient("5");
+    mydb.addIngredient("1");
+    mydb.addIngredient("2");
+    mydb.addIngredient("3");
+    mydb.addIngredient("4");
+    mydb.addIngredient("5");
+    mydb.addIngredient("Instruct");
+    mydb.insertRecipe();
     mydb.printDB();
     }//Close main
 
