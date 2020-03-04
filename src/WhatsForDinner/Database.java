@@ -2,10 +2,8 @@ package WhatsForDinner;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
-
-//TODO Add method to randomly pull recipe from db
-//TODO search parameter for protein type
 
 class Database{
 
@@ -20,7 +18,8 @@ private int counter = 3;
    *
    *
    ********************************************************************************************************************/
-  Database() throws SQLException {
+
+   Database() {
 
       createDB();
       createTable();
@@ -29,12 +28,14 @@ private int counter = 3;
 
   }//Close default constructor.
 
+
    /********************************************************************************************************************
    * createDB
    *
    * Creates the database
    ********************************************************************************************************************/
-    public void createDB() {
+
+   public void createDB() {
         //Must declare database driver or the whole damn thing freaks out at you
         try {
             Class.forName("org.h2.Driver");
@@ -45,11 +46,13 @@ private int counter = 3;
 
     }//Close createDB
 
+
    /********************************************************************************************************************
    * createTable
    *
    * Creates the table in the database
    ********************************************************************************************************************/
+
     public void createTable(){
         try{
             //Establish connection to the database
@@ -91,6 +94,7 @@ private int counter = 3;
 
     }//Close createTable
 
+
    /********************************************************************************************************************
    * resetArguments
    *
@@ -103,11 +107,13 @@ private int counter = 3;
        }
    }//close resetArguments
 
+
    /********************************************************************************************************************
    * addName
    * @param name
    * inserts food name into database.
    ********************************************************************************************************************/
+
     public void addName(String name)  {
 
         arguments.set(0, name);
@@ -120,6 +126,7 @@ private int counter = 3;
    * @param type
    * inserts food type into string for database.
    ********************************************************************************************************************/
+
    public void addType(String type)  {
 
     arguments.set(1,type);
@@ -132,11 +139,13 @@ private int counter = 3;
    * @param protein
    * inserts food type into string for database.
    ********************************************************************************************************************/
-    public void addProtein(String protein)  {
+
+   public void addProtein(String protein)  {
 
         arguments.set(2, protein);
 
     }//Close addProtein
+
 
    /********************************************************************************************************************
    * addInstructions
@@ -170,10 +179,10 @@ private int counter = 3;
 
    public void insertRecipe()  {
        //Command passed to SQL database as a String
-       Statement statement = null;
+
        try {
            Connection conn = DriverManager.getConnection(dbPath ,"user","password");
-           statement = conn.createStatement();
+           Statement statement = conn.createStatement();
 
            String sqlInsert = "Insert into FOOD values" +
            "('" + arguments.get(0) + "', '" + arguments.get(1) + "', '" + arguments.get(2) + "', '" + arguments.get(3) + "'," +
@@ -196,12 +205,14 @@ private int counter = 3;
 
    }//close insertCommand
 
+
    /********************************************************************************************************************
    * searchByName
    * @param name
    * @return ArrayList resultList
    * Searches Database by name of food
    ********************************************************************************************************************/
+
    public ArrayList<ArrayList<String>> searchByName(String name){
 
        ArrayList<ArrayList<String>> resultList = new ArrayList<>();
@@ -222,7 +233,7 @@ private int counter = 3;
 
            //add each part of the recipe to an array list of strings
            while(resultSet.next()){
-               ArrayList recipe = new ArrayList<>();
+               ArrayList<String> recipe = new ArrayList<>();
                for(int i =1; i<=19;i++){
                    recipe.add(resultSet.getString(i));
                }
@@ -239,12 +250,14 @@ private int counter = 3;
        return resultList;
    }//close searchByName
 
+
    /********************************************************************************************************************
    * searchByType
    * @param type
    * @return ArrayList resultList
    * Searches DB for type of food
    ********************************************************************************************************************/
+
    public ArrayList<ArrayList<String>> searchByType(String type){
 
        ArrayList<ArrayList<String>> resultList = new ArrayList<>();
@@ -282,12 +295,14 @@ private int counter = 3;
        return resultList;
    }//close searchByType
 
-    /********************************************************************************************************************
-    * searchbyProtein
-    * @param protein
-    * @return ArrayList resultList
-    * Seraches DB for type of protein
-    ********************************************************************************************************************/
+
+   /********************************************************************************************************************
+   * searchbyProtein
+   * @param protein
+   * @return ArrayList resultList
+   * Seraches DB for type of protein
+   ********************************************************************************************************************/
+
     public ArrayList<ArrayList<String>> searchByProtein(String protein){
 
         ArrayList<ArrayList<String>> resultList = new ArrayList<>();
@@ -326,14 +341,54 @@ private int counter = 3;
     }//close searchByProtein
 
 
-    /********************************************************************************************************************
+   /********************************************************************************************************************
+   * randomByType
+   * @param type
+   * @return ArrayList resultList
+   * Searches DB for type of food and picks random from that list
+   ********************************************************************************************************************/
+
+   public ArrayList<String> randomByType(String type){
+
+       Random rando = new Random();
+       //Store all possible selections
+       ArrayList<ArrayList<String>> pool = searchByType(type);
+       //Generate a random choice
+       int selection = rando.nextInt(pool.size());
+
+       return pool.get(selection);
+
+   }//close randomByType
+
+
+   /********************************************************************************************************************
+   * randomByType
+   * @param protein
+   * @return ArrayList resultList
+   * Searches DB for type of food and picks random from that list
+   ********************************************************************************************************************/
+
+   public ArrayList<String> randomByProtein(String protein){
+
+        Random rando = new Random();
+        //Store all possible selections
+        ArrayList<ArrayList<String>> pool = searchByProtein(protein);
+        //Generate a random choice
+        int selection = rando.nextInt(pool.size());
+
+        return pool.get(selection);
+
+    }//close randomByProtein
+
+   /********************************************************************************************************************
    * printDB
    *
    * Prints entire database
    ********************************************************************************************************************/
+
    public void printDB(){
-  //TODO fix this method so its useful in production
-       try {
+
+         try {
            Connection conn = DriverManager.getConnection(dbPath ,"user","password");
             //Statement builders are apparently a necessity
             Statement statement = conn.createStatement();
@@ -375,6 +430,7 @@ private int counter = 3;
    *
    * Deletes the entire database
    ********************************************************************************************************************/
+
     public void clearDB(){
         try {
 
@@ -394,11 +450,12 @@ private int counter = 3;
 
     }
 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+
+    public static void main(String[] args){
     Database mydb = new Database();
     //mydb.clearDB();
     //mydb.printDB();
-    mydb.addName("burrito");
+   /* mydb.addName("burrito");
     mydb.addType("murican");
     mydb.addProtein("chicken");
     mydb.addIngredient("1");
@@ -411,15 +468,16 @@ private int counter = 3;
     mydb.addIngredient("3");
     mydb.addIngredient("4");
     mydb.addIngredient("5");
-    //mydb.addIngredient("1");
-    //mydb.addIngredient("2");
-    //mydb.addIngredient("3");
-    //mydb.addIngredient("4");
-    //mydb.addIngredient("5");
+    mydb.addIngredient("1");
+    mydb.addIngredient("2");
+    mydb.addIngredient("3");
+    mydb.addIngredient("4");
+    mydb.addIngredient("5");
     mydb.addInstructions("Instruct a motherfucker on how to do a thing");
-    mydb.insertRecipe();
-    mydb.printDB();
+    mydb.insertRecipe();*/
+    //mydb.printDB();
     //System.out.println(mydb.searchByProtein("pork"));
+    // System.out.println(mydb.randomByType("mexican"));
     }//Close main
 
 
