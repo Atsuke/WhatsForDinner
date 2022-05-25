@@ -473,7 +473,7 @@ private int counter = 3;
     mydb.addIngredient("3");
     mydb.addIngredient("4");
     mydb.addIngredient("5");
-    mydb.addInstructions("Instruct a motherfucker on how to do a thing");
+    mydb.addInstructions("Sample instructions here");
     mydb.insertRecipe();*/
     //mydb.printDB();
     //System.out.println(mydb.searchByProtein("pork"));
